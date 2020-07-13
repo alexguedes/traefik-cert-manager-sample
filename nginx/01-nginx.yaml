@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: secure-alexguedescom-nginx
+  name: secure-alexguedescom-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: secure-alexguedescom-nginx
+  template:
+    metadata:
+      labels:
+        run: secure-alexguedescom-nginx
+        app: secure-alexguedescom-nginx
+    spec:
+      containers:
+      - image: nginx
+        name: secure-alexguedescom-nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html
+          name: alexguedescom-volume
+      volumes:
+      - name: alexguedescom-volume
+        configMap:
+          name: nginx-index-html
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: secure-alexguedescom-nginx
+  name: secure-alexguedescom-nginx
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: secure-alexguedescom-nginx
+
+---
+apiVersion: v1
+data:
+  index.html: |-
+    <!doctype html>
+    <html>
+      <head>
+        <title>Welcome to your secure web page using Nginx</title>
+      </head>
+      <body>
+        <p>This will be a secure web page at the end of the tutorial!</p>
+      </body>
+    </html>
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: nginx-index-html

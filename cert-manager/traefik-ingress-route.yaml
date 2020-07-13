@@ -1,0 +1,45 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: https-only
+  namespace: secure-alexguedescom
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: secure-alexguedescom-ingress-https
+  namespace: secure-alexguedescom
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`secure.alexguedes.com`)
+      kind: Rule
+      services:
+        - name: secure-alexguedescom-nginx
+          port: 80
+  tls:
+    secretName: secure-alexguedescom-cert
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: secure-alexguedescom-ingress-http
+  namespace: secure-alexguedescom
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`secure.alexguedes.com`)
+      middlewares:
+        - name: https-only
+      kind: Rule
+      services:
+        - name: secure-alexguedescom-nginx
+          port: 80

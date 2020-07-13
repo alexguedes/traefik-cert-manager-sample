@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: secure-alexguedescom-ingress-https
+  namespace: secure-alexguedescom
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`secure.alexguedes.com`)
+      kind: Rule
+      services:
+        - name: secure-alexguedescom-nginx
+          port: 80
+  tls:
+    secretName: secure-alexguedescom-cert
